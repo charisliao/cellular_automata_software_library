@@ -23,7 +23,7 @@ int CellularAutomata::setup_dimension(int ndims, int dim1, int dim2){
         next_grid.push_back(grid1D);
         return 0;
     } else if (ndims == 2) {
-        vector<vector<int>> grid2D(dim1, vector<int>(dim2));   // 2D cellular automata (size dim1 x dim2)
+        vector<vector<int> > grid2D(dim1, vector<int>(dim2));   // 2D cellular automata (size dim1 x dim2)
         current_grid = grid2D;
         next_grid = grid2D;
         return 0;
@@ -207,6 +207,28 @@ int CellularAutomata::step(){
                     for (int k = -radius; k <= radius; k++) {
                         for (int l = -radius; l <= radius; l++) {
                             if (k != 0 || l != 0) {
+                                if (i + k >= 0 && i + k <= current_grid.size() && j + l >= 0 && j + l <= current_grid[i].size()) {
+                                    sum += current_grid[i + k][j + l];
+                                }
+                            }
+                        }
+                    }
+                    if (rule == 1) {   // majority rule
+                        if (sum >= (2 * radius + 1) * (2 * radius + 1) / 2) {
+                            next_grid[i][j] = 1;
+                        } else {
+                            next_grid[i][j] = 0;
+                        }
+                    }
+                }
+            }
+        } else if (bound_type == 3) { // cut-off boundary
+            for (int i = 0; i < current_grid.size(); i++) {
+                for (int j = 0; j < current_grid[i].size(); j++) {
+                    int sum = 0;
+                    for (int k = -radius; k <= radius; k++) {
+                        for (int l = -radius; l <= radius; l++) {
+                            if (k != 0 || l != 0) {
                                 if (i + k >= 0 && i + k < current_grid.size() && j + l >= 0 && j + l < current_grid[i].size()) {
                                     sum += current_grid[i + k][j + l];
                                 }
@@ -268,6 +290,26 @@ int CellularAutomata::step(){
                     int sum = 0;
                     for (int k = -radius; k <= radius; k++) {
                         for (int l = -radius; l <= radius; l++) {
+                            if (i + k >= 0 && i + k <= current_grid.size() && j + l >= 0 && j + l <= current_grid[i].size()) {
+                                sum += current_grid[i + k][j + l];
+                            }
+                        }
+                    }
+                    if (rule == 1) {   // majority rule
+                        if (sum >= (2 * radius + 1) * (2 * radius + 1) / 2) {
+                            next_grid[i][j] = 1;
+                        } else {
+                            next_grid[i][j] = 0;
+                        }
+                    }
+                }
+            }
+        } else if (bound_type == 3) { //cut-off boundary 
+            for (int i = 0; i < current_grid.size(); i++) {
+                for (int j = 0; j < current_grid[i].size(); j++) {
+                    int sum = 0;
+                    for (int k = -radius; k <= radius; k++) {
+                        for (int l = -radius; l <= radius; l++) {
                             if (i + k >= 0 && i + k < current_grid.size() && j + l >= 0 && j + l < current_grid[i].size()) {
                                 sum += current_grid[i + k][j + l];
                             }
@@ -290,95 +332,7 @@ int CellularAutomata::step(){
     }
     return 0;
 }
-
-// Function: Print the grid to the screen
-// Input: none
-// Output: none
-// Return: 0 (success)
-int CellularAutomata::print_grid() {
-    cout << "Current grid:" << endl;
-    cout << "-------------" << endl;
-    cout << "Grid size: " << current_grid.size() << " x " << current_grid[0].size() << endl;
-    for (int i = 0; i < current_grid.size(); i++) {
-        for (int j = 0; j < current_grid[i].size(); j++) {
-            cout << current_grid[i][j] << " ";
-        }
-        cout << endl;
-    }
-    return 0;
-}
-
-// Function: Print the grid to a file
-// Input: string filename
-// Output: none
-// Return: 0 (success)
-//         -1 (fail)
-int CellularAutomata::print_grid(string filename) {
-    ofstream outfile;
-    outfile.open(filename.c_str());
-    if (outfile.is_open()) {
-        outfile << "Current grid:" << endl;
-        outfile << "-------------" << endl;
-        outfile << "Grid size: " << current_grid.size() << " x " << current_grid[0].size() << endl;
-        for (int i = 0; i < current_grid.size(); i++) {
-            for (int j = 0; j < current_grid[i].size(); j++) {
-                outfile << current_grid[i][j] << " ";
-            }
-            outfile << endl;
-        }
-        outfile.close();
-        return 0;
-    } else {
-        cout << "Error: unable to open file" << endl;
-        return -1;
-    }
-}
                     
-// Function: Run the simulation
-// Perform the simulation for a given number of steps
-// Input: int number of steps
-//        bool whether to print the grid to the screen
-//        bool whether to print the grid to a file
-//        string filename
-// Output: none
-// Return: 0: success
-//         -1: fail (invalid number of steps)
-//         -2: fail (invalid boundary type)
-//         -3: fail (invalid neighborhood type)
-//         -4: fail (invalid filename)
-int CellularAutomata::run_sim(int steps, bool print_screen=true, bool print_file=false, string filename="none") {
-    int err;   // error code    
-
-    if (steps < 0) {
-        cout << "Error: invalid number of steps" << endl;
-        return (-1);   // Error: invalid number of steps
-    }
-
-    if(print_file == true && filename == "none") {
-        cout << "Error: invalid filename" << endl;
-        return (-4);   // Error: invalid filename
-    }
-
-    for (int i = 0; i < steps; i++) {
-        err = step(); 
-        if (err == -1) {
-            cout << "Error: invalid neighborhood type" << endl;
-            return (-3);   // Error: invalid neighborhood type
-        } else if (err == -2) {
-            cout << "Error: invalid boundary type" << endl;
-            return (-2);   // Error: invalid boundary type
-        }
-        if (print_screen == true) {
-            print_grid();
-        }
-
-        if (print_file == true) {
-            print_grid(filename);
-        }
-    }
-
-    return 0;
-}
 
     
 

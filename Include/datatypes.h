@@ -28,8 +28,8 @@ class CellularAutomata
         int rule;        // Rule
         int dim1, dim2;  // Dimensions of the grid
 
-        vector<vector<int>> current_grid;  // Current grid
-        vector<vector<int>> next_grid;     // Next grid
+        vector<vector<int> > current_grid;  // Current grid
+        vector<vector<int> > next_grid;     // Next grid
 
     public:
         int setup_dimension(int ndims, int dim1, int dim2);   // Set the dimensions of the cellular automata model
