@@ -13,6 +13,8 @@
 #include <ctime>        // this program calls time() to initialize
                         // the seed of the C++/C random number generator
 #include <string>       // use the STL string class for filenames
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -27,6 +29,7 @@ class CellularAutomata
         int nstates;     // Number of states
         int rule;        // Rule
         int dim1, dim2;  // Dimensions of the grid
+        int run_tick;   // Run tick: checking to make sure user does not modify set up after running simulation
 
         vector<vector<int> > current_grid;  // Current grid
         vector<vector<int> > next_grid;     // Next grid
@@ -39,9 +42,8 @@ class CellularAutomata
         int init_cond(int x_state, double prob);              // Set the initial condition of the cellular automata model
         int init_cond_rewrite(int x_state, double prob);      // rewrite for other cell states (not just empty)
         int setup_rule(int rule_type);                        // Set the rule of the cellular automata model
-        int grid_size();   // Size of the grid
         int step();                                           // Step the cellular automata model
-        int run_sim(int nsteps, bool print=true, bool file=false, string filename="none");  // Run the cellular automata model
+        int run_sim(int steps, bool print_screen, bool print_file, string filename);  // Run the cellular automata model
         int print_grid();                                     // Print the current grid
         int print_grid(string filename);                        // Print the current grid to a file
 };
